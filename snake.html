@@ -1,0 +1,78 @@
+<!DOCTYPE>
+
+<html>
+
+	<body>
+
+		<script>
+
+			var gs = 10;
+
+			var canvas = document.createElement("canvas"); document.body.appendChild(canvas);
+			canvas.height = gs * 60;
+			canvas.width = gs * 80;
+			var ctx = canvas.getContext("2d");
+			
+			function reset () {
+				play = false;
+				direction = [1, 0];
+				snake = [ [10, 10], [9, 10], [8, 10], [7, 10], [6, 10] ];
+				apple = [15, 15];
+				level = 1;
+			} reset();
+			
+			function tick () {
+				setTimeout(tick, 1000/level);
+				if (play === true) game();
+			} tick();
+			
+			function game () {
+			
+				var n = [snake[0][0] + direction[0], snake[0][1] + direction[1]];
+				if (n[0] < 0) n[0] = canvas.width / gs - 1;
+				if (n[0] > canvas.width / gs - 1) n[0] = 0;
+				if (n[1] < 0) n[1] = canvas.height / gs - 1;
+				if (n[1] > canvas.height / gs - 1) n[1] = 0;
+				snake.unshift(n);
+				
+				if (snake[0][0] == apple[0] && snake[0][1] == apple[1]) {
+					level++;
+					apple = [Math.floor(canvas.width * Math.random() / gs), Math.floor(canvas.height * Math.random() / gs)];
+				};
+				
+				snake = snake.slice(0, level + 4);
+				
+				ctx.fillStyle = "#808080";
+				ctx.fillRect(0, 0, canvas.width, canvas.height);
+				
+				ctx.font = "20px Arial";
+				ctx.fillStyle = "#EEEEEE";
+				ctx.fillText("Level: " + level, 5, 20);
+
+				ctx.fillStyle = "#FF0000";
+				ctx.fillRect(apple[0] * gs + 1, apple[1] * gs + 1, gs - 2, gs - 2);
+				
+				ctx.fillStyle = "#32CD32";
+				snake.forEach(function ($v, $i) {
+					ctx.fillRect($v[0] * gs + 1, $v[1] * gs + 1, gs - 2, gs - 2);
+					if ($i > 0 && $v[0] == snake[0][0] && $v[1] == snake[0][1]) reset();
+				});
+				
+			} game();
+			
+			document.addEventListener("keydown", function ($event) {
+				play = true;
+				switch ($event.keyCode) {
+					case 37: newDirection = [-1, 0]; break;
+					case 38: newDirection = [0, -1]; break;
+					case 39: newDirection = [+1, 0]; break;
+					case 40: newDirection = [0, +1]; break;
+				};
+				if (!(Math.abs(newDirection[0]) == Math.abs(direction[0]) && Math.abs(newDirection[1]) == Math.abs(direction[1]))) direction = newDirection;
+			});
+			
+		</script>
+
+	</body>
+	
+</html>
